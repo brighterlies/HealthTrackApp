@@ -7,6 +7,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -54,9 +55,17 @@ public class UsuarioWebTest {
     @BeforeEach
     public void setUp() {
         WebDriverManager.chromedriver().setup();  // Descarga y configura el driver de Chrome automáticamente
-        driver = new ChromeDriver();               // Instancia el navegador Chrome
+
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--headless=new");   // Para modo headless moderno
+        options.addArguments("--disable-gpu");
+
+        driver = new ChromeDriver(options);        // Instancia el navegador Chrome con opciones
         wait = new WebDriverWait(driver, Duration.ofSeconds(5)); // Esperas explícitas para elementos
-        driver.manage().window().maximize();      // Maximiza la ventana para evitar problemas de visibilidad
+
+        driver.manage().window().setSize(new Dimension(1920, 1080)); // Tamaño fijo en lugar de maximize()
     }
 
     // Test que simula el flujo completo de actualizar el peso de un usuario en la web
