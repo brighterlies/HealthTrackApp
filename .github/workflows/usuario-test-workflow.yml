@@ -30,33 +30,38 @@ jobs:
 
     - name: Instalar dependencias (Chrome, ChromeDriver, XVFB, JMeter)
       run: |
-        set -euxo pipefail
         sudo apt-get update
-        sudo apt-get install -y wget gnupg2 ca-certificates unzip xvfb jmeter
-
-        # Importar la clave GPG oficial de Google
-        curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor -o /usr/share/keyrings/google-chrome.gpg
-
-        # Añadir el repositorio de Google Chrome con signed-by
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-
+        sudo apt-get install -y wget gnupg2 ca-certificates
+        # Importar clave GPG de Google (funcional en Ubuntu 24.04)
+        gpg --keyserver keyserver.ubuntu.com --recv-keys 32EE5355A6BC6E42
+        gpg --export 32EE5355A6BC6E42 | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
         sudo apt-get update
-        sudo apt-get install -y google-chrome-stable
+        sudo apt-get install -y google-chrome-stable xvfb unzip
 
-        # Instalar ChromeDriver acorde a la versión de Chrome
-        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
-        DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}")
+        # Instalar ChromeDriver con manejo de versiones robusto
+        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+')
+        DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}")
+
+        if [ -z "$DRIVER_VERSION" ]; then
+          MAJOR_VERSION=$(echo $CHROME_VERSION | cut -d. -f1)
+          DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${MAJOR_VERSION}")
+        fi
+
         wget -q "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
         unzip chromedriver_linux64.zip
         sudo mv chromedriver /usr/local/bin/
         sudo chmod +x /usr/local/bin/chromedriver
+
+        # Instalar JMeter
+        sudo apt-get install -y jmeter
 
     - name: Ejecutar pruebas con Maven (usando Xvfb para entorno gráfico)
       env:
         DISPLAY: :99
         MAVEN_OPTS: "-Dmaven.test.failure.ignore=false"
       run: |
-        Xvfb :99 &
+        Xvfb :99 & 
         sleep 3
         mvn clean test
 
