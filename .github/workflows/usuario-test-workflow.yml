@@ -31,10 +31,10 @@ jobs:
     - name: Instalar dependencias (Chrome, ChromeDriver, XVFB, JMeter)
       run: |
         sudo apt-get update
-        sudo apt-get install -y wget gnupg2
-        wget -q https://dl.google.com/linux/linux_signing_key.pub -O google-key.pub
-        sudo install -D -o root -g root -m 644 google-key.pub /usr/share/keyrings/google-linux-signing-key.gpg
-        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-linux-signing-key.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
+        sudo apt-get install -y wget gnupg2 ca-certificates
+        wget -q https://dl.google.com/linux/linux_signing_key.pub -O google-key.gpg
+        sudo install -D -o root -g root -m 644 google-key.gpg /usr/share/keyrings/google-chrome.gpg
+        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable xvfb unzip
         # Instalar ChromeDriver (versión compatible con Chrome)
