@@ -78,4 +78,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: reporte-jmeter
-        path: reporte_html
+        path: ./reporte_html
