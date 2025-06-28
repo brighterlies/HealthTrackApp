@@ -1,0 +1,53 @@
+name: CI con Java, Maven, Selenium y JMeter
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  construir-y-probar:
+    runs-on: ubuntu-latest
+
+    services:
+      # Servicio de Chrome para Selenium
+      selenium:
+        image: selenium/standalone-chrome:latest
+        ports:
+          - 4444:4444
+
+    steps:
+    - name: Obtener el repositorio
+      uses: actions/checkout@v3
+
+    - name: Configurar JDK 17
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 17
+
+    - name: Cachear dependencias de Maven
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+    - name: Compilar y ejecutar pruebas con Maven
+      env:
+        DISPLAY: :99
+        MAVEN_OPTS: "-Dmaven.test.failure.ignore=false"
+      run: |
+        sudo apt-get install -y xvfb
+        Xvfb :99 &
+        mvn clean test
+
+    - name: Instalar JMeter
+      run: sudo apt-get install -y jmeter
+
+    - name: Ejecutar pruebas de rendimiento con JMeter
+      run: |
+        jmeter -n -t test.jmx -l resultados.jtl
+        jmeter -g resultados.jtl -o reporte_html
