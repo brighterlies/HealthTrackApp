@@ -73,3 +73,9 @@ jobs:
       run: |
         jmeter -n -t test.jmx -l resultados.jtl
         jmeter -g resultados.jtl -o reporte_html
+    
+    - name: Subir reporte de JMeter como artefacto
+      uses: actions/upload-artifact@v3
+      with:
+        name: reporte-jmeter
+        path: reporte_html
