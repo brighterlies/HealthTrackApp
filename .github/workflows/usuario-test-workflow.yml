@@ -10,13 +10,6 @@ jobs:
   construir-y-probar:
     runs-on: ubuntu-latest
 
-    services:
-      # Servicio de Chrome para Selenium
-      selenium:
-        image: selenium/standalone-chrome:latest
-        ports:
-          - 4444:4444
-
     steps:
     - name: Obtener el repositorio
       uses: actions/checkout@v3
@@ -35,17 +28,33 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-maven-
 
-    - name: Compilar y ejecutar pruebas con Maven
+    - name: Instalar dependencias (Chrome, ChromeDriver, XVFB, JMeter)
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y wget gnupg2
+        wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+        sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+        sudo apt-get update
+        sudo apt-get install -y google-chrome-stable
+        sudo apt-get install -y xvfb unzip
+        # Instalar ChromeDriver (versión compatible con Chrome)
+        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
+        DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}")
+        wget -q "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
+        unzip chromedriver_linux64.zip
+        sudo mv chromedriver /usr/local/bin/
+        sudo chmod +x /usr/local/bin/chromedriver
+        # Instalar JMeter
+        sudo apt-get install -y jmeter
+
+    - name: Ejecutar pruebas con Maven (usando Xvfb para entorno gráfico)
       env:
         DISPLAY: :99
         MAVEN_OPTS: "-Dmaven.test.failure.ignore=false"
       run: |
-        sudo apt-get install -y xvfb
-        Xvfb :99 &
+        Xvfb :99 & 
+        sleep 3
         mvn clean test
-
-    - name: Instalar JMeter
-      run: sudo apt-get install -y jmeter
 
     - name: Ejecutar pruebas de rendimiento con JMeter
       run: |
