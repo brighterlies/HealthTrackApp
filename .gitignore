@@ -1,0 +1,33 @@
+# Maven: carpetas generadas automáticamente
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Java: compilados y temporales
+*.class
+*.log
+*.tmp
+*.bak
+
+# Selenium y WebDriver
+chromedriver*
+geckodriver*
+selenium-screenshot.png
+
+# Informes de pruebas
+surefire-reports/
+jacoco.exec
+/reporte/
+/site/
+*.jtl
+
+# Configuraciones de IDEs
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+*.DS_Store
+
+# Archivos del sistema operativo
+Thumbs.db
+ehthumbs.db
