@@ -78,4 +78,17 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: reporte-jmeter
-        path: ./reporte_html
+        path: reporte_html
+
+    - name: Ejecutar Pruebas de JMeter
+      run: |
+            rm -rf jmeter-reports
+             mkdir jmeter-reports
+             jmeter -n -t tests/rendimiento-test.jmx -l jmeter-reports/results.jtl -e -o jmeter-reports/html-report
+
+    - name: Subir Reporte HTML
+      uses: actions/upload-artifact@v4
+      if: always()
+      with: 
+          name: jmeter-performance-report
+          path: jmeter-reports/html-report
