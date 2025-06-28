@@ -8,6 +8,11 @@ target/
 *.tmp
 *.bak
 
+# Selenium y WebDriver
+chromedriver*
+geckodriver*
+selenium-screenshot.png
+
 # Informes de pruebas
 surefire-reports/
 jacoco.exec
