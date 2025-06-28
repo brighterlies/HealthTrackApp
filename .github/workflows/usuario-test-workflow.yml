@@ -32,12 +32,13 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y wget gnupg2 ca-certificates
-        wget -q https://dl.google.com/linux/linux_signing_key.pub -O google-key.gpg
-        sudo install -D -o root -g root -m 644 google-key.gpg /usr/share/keyrings/google-chrome.gpg
+        # Importar clave GPG de Google (funcional en Ubuntu 24.04)
+        gpg --keyserver keyserver.ubuntu.com --recv-keys 32EE5355A6BC6E42
+        gpg --export 32EE5355A6BC6E42 | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null
         echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list > /dev/null
         sudo apt-get update
         sudo apt-get install -y google-chrome-stable xvfb unzip
-        # Instalar ChromeDriver (versión compatible con Chrome)
+        # Instalar ChromeDriver
         CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+' | head -1)
         DRIVER_VERSION=$(wget -qO- "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION%.*}")
         wget -q "https://chromedriver.storage.googleapis.com/${DRIVER_VERSION}/chromedriver_linux64.zip"
