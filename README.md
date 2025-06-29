@@ -36,14 +36,14 @@ Este repositorio contiene la implementación de pruebas automatizadas y pipeline
 - Docker (opcional para SonarQube)
 
 ### 1. Ejecutar pruebas unitarias y funcionales
-mvn clean test
+`mvn clean test`
 
 ### 2. Ejecutar pruebas de carga
-jmeter -n -t healthtrackapp-test.jmx -l resultados.jtl
-jmeter -g resultados.jtl -o reporte_html
+`jmeter -n -t healthtrackapp-test.jmx -l resultados.jtl`
+`jmeter -g resultados.jtl -o reporte_html`
 
 ### 3. Analizar con SonarQube
-mvn verify sonar:sonar \
-  -Dsonar.projectKey=HealthTrackApp \
-  -Dsonar.host.url=http://localhost:9000 \
-  -Dsonar.token=TU_TOKEN
+`mvn verify sonar:sonar \`
+ ` -Dsonar.projectKey=HealthTrackApp \`
+  `-Dsonar.host.url=http://localhost:9000 \`
+  `-Dsonar.token=TU_TOKEN`
