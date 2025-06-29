@@ -71,7 +71,7 @@ jobs:
 
     - name: Ejecutar pruebas de rendimiento con JMeter
       run: |
-        jmeter -n -t test.jmx -l resultados.jtl
+        jmeter -n -t healthtrackapp-test.jmx -l resultados.jtl
         jmeter -g resultados.jtl -o reporte_html
     
     - name: Subir reporte de JMeter como artefacto
