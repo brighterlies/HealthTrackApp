@@ -43,7 +43,4 @@ Este repositorio contiene la implementación de pruebas automatizadas y pipeline
 `jmeter -g resultados.jtl -o reporte_html`
 
 ### 3. Analizar con SonarQube
-`mvn verify sonar:sonar \`
- ` -Dsonar.projectKey=HealthTrackApp \`
-  `-Dsonar.host.url=http://localhost:9000 \`
-  `-Dsonar.token=TU_TOKEN`
+`mvn clean verify -DskipTests=true sonar:sonar -Dsonar.projectKey=HealthTrackApp -Dsonar.host.url=http://localhost:9000 -Dsonar.login=TU_TOKEN`
